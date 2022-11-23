@@ -1,11 +1,12 @@
 package decided
 
 import (
+	"github.com/herumi/bls-eth-go-binary/bls"
+
 	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/qbft/spectest/tests"
 	"github.com/bloxapp/ssv-spec/types"
 	"github.com/bloxapp/ssv-spec/types/testingutils"
-	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
 // CurrentInstancePastRound tests a decided msg received for current running instance for a past round
@@ -38,13 +39,17 @@ func CurrentInstancePastRound() *tests.ControllerSpecTest {
 	}
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      qbft.FirstRound,
-			Identifier: identifier[:],
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			testingutils.Testing4SharesSet().Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      qbft.FirstRound,
+				Identifier: identifier[:],
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
+			},
+		),
 
 		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
@@ -63,13 +68,17 @@ func CurrentInstancePastRound() *tests.ControllerSpecTest {
 	}
 	msgs = append(msgs, rcMsgs...)
 	msgs = append(msgs, []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      2,
-			Identifier: identifier[:],
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			testingutils.Testing4SharesSet().Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      2,
+				Identifier: identifier[:],
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+			},
+		),
 
 		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
@@ -138,7 +147,7 @@ func CurrentInstancePastRound() *tests.ControllerSpecTest {
 					}),
 				DecidedVal:         []byte{1, 2, 3, 4},
 				DecidedCnt:         1,
-				ControllerPostRoot: "e7e94573bd69d0fac4ee33b931efbc3a995142e8937497b5ad536f5b2b0864f4",
+				ControllerPostRoot: "ad6be16e4b01f66fde56f7d04f733dfb5b131ac8f216168215f35fb109c28820",
 			},
 		},
 	}
