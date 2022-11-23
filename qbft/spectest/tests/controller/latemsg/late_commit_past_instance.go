@@ -1,11 +1,12 @@
 package latemsg
 
 import (
+	"github.com/herumi/bls-eth-go-binary/bls"
+
 	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/qbft/spectest/tests"
 	"github.com/bloxapp/ssv-spec/types"
 	"github.com/bloxapp/ssv-spec/types/testingutils"
-	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
 // LateCommitPastInstance tests process commit msg for a previously decided instance
@@ -56,11 +57,11 @@ func LateCommitPastInstance() *tests.ControllerSpecTest {
 		Name: "late commit past instance",
 		RunInstanceData: []*tests.RunInstanceData{
 			instanceData(qbft.FirstHeight, "aa402d7487719b17dde352e2ac602ba2c7d895e615ab12cd93d816f6c4fa0967"),
-			instanceData(1, "457bc465febc4d1d626ad19d0f83621fbca5f0c2c6f9f3665292c602e615896a"),
-			instanceData(2, "060c2a36313e8de4cfa530d7839945439e54344c3368eab749c61c5a76eb602c"),
-			instanceData(3, "80f4ea4b56c6062724bc789eb3455c33650191e2c7f775f59b40b9fecc35f93b"),
-			instanceData(4, "3003436a999f2fbd9d4c130591361243190fd3ab1da6d92463cbc832f8165abf"),
-			instanceData(5, "e7a2324d9cbd69497455b50bde88cb47524b79b14653d024caf06ac7a2b28ba7"),
+			instanceData(1, "6eaf87922fcf15949d1a7e81c29528cf219dbb445dd3f323452b29bce86b8606"),
+			instanceData(2, "4ab670bd4d1aedb4eaba76ea578880d7a3f5e585a4b443ff6bf27899d1d9433c"),
+			instanceData(3, "8d91e5a72e416ef0b46cf7cadae265cc335467a7683698f120ae6b9d52afe3d5"),
+			instanceData(4, "9fd86252efe33d7a4335ba4e17f6e957dc546cb071a6b1f147328c994f657738"),
+			instanceData(5, "887b7a4af9cac0e27552768e7648ef9e8e198ec9c66c629026d0b404de9ced51"),
 			{
 				InputValue: []byte{1, 2, 3, 4},
 				InputMessages: []*qbft.SignedMessage{
@@ -75,7 +76,7 @@ func LateCommitPastInstance() *tests.ControllerSpecTest {
 							Data:       testingutils.CommitDataBytes([]byte{1, 2, 3, 4}),
 						}),
 				},
-				ControllerPostRoot: "4a6ce4445ce9f059ffe3214e7efa3a5e4067edaa5dde8334213f98119d3a0781",
+				ControllerPostRoot: "988d8bdcf513f189a6fcf8906249b707275a214b98d4b7496380d015a6adbcb7",
 			},
 		},
 	}
