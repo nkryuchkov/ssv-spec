@@ -10,19 +10,25 @@ import (
 // MsgError tests a process msg returning an error
 func MsgError() *tests.ControllerSpecTest {
 	identifier := types.NewMsgID(testingutils.TestingValidatorPubKey[:], types.BNRoleAttester)
+	ks := testingutils.Testing4SharesSet()
+
 	return &tests.ControllerSpecTest{
 		Name: "process msg error",
 		RunInstanceData: []*tests.RunInstanceData{
 			{
 				InputValue: []byte{1, 2, 3, 4},
 				InputMessages: []*qbft.SignedMessage{
-					testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], 1, &qbft.Message{
-						MsgType:    qbft.ProposalMsgType,
-						Height:     qbft.FirstHeight,
-						Round:      100,
-						Identifier: identifier[:],
-						Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
-					}),
+					testingutils.SignQBFTMsg(
+						ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 100)],
+						testingutils.TestingProposer(ks, qbft.FirstHeight, 100),
+						&qbft.Message{
+							MsgType:    qbft.ProposalMsgType,
+							Height:     qbft.FirstHeight,
+							Round:      100,
+							Identifier: identifier[:],
+							Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
+						},
+					),
 				},
 				ControllerPostRoot: "5b6ebc3aa0bfcedd466fca3fca7e1dcc0245def7d61d65aee1462436d819c7d0",
 			},
