@@ -45,6 +45,7 @@ var baseRunner = func(role types.BeaconRole, valCheck qbft.ProposedValueCheckF, 
 	config.ProposerF = func(state *qbft.State, round qbft.Round) types.OperatorID {
 		return 1
 	}
+	//config.ProposerF = qbft.RoundRobinProposer
 	config.Network = net
 	config.Signer = km
 
@@ -201,14 +202,18 @@ var SSVDecidingMsgs = func(consensusData []byte, ks *TestKeySet, role types.Beac
 
 var DecidingMsgsForHeight = func(consensusData, msgIdentifier []byte, height qbft.Height, keySet *TestKeySet) []*qbft.SignedMessage {
 	msgs := make([]*qbft.SignedMessage, 0)
-	for h := qbft.Height(qbft.FirstHeight); h <= height; h++ {
-		msgs = append(msgs, SignQBFTMsg(keySet.Shares[1], 1, &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     h,
-			Round:      qbft.FirstRound,
-			Identifier: msgIdentifier,
-			Data:       ProposalDataBytes(consensusData, nil, nil),
-		}))
+	for h := qbft.FirstHeight; h <= height; h++ {
+		msgs = append(msgs, SignQBFTMsg(
+			keySet.Shares[TestingProposer(keySet, h, qbft.FirstRound)],
+			TestingProposer(keySet, h, qbft.FirstRound),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     h,
+				Round:      qbft.FirstRound,
+				Identifier: msgIdentifier,
+				Data:       ProposalDataBytes(consensusData, nil, nil),
+			},
+		))
 
 		// prepare
 		for i := uint64(1); i <= keySet.Threshold; i++ {
