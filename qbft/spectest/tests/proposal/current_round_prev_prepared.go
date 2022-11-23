@@ -11,23 +11,24 @@ import (
 func CurrentRoundPrevPrepared() *tests.MsgProcessingSpecTest {
 	pre := testingutils.BaseInstance()
 	pre.State.Round = 10
+	ks := testingutils.Testing4SharesSet()
 
 	prepareMsgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      8,
 			Identifier: []byte{1, 2, 3, 4},
 			Data:       testingutils.PrepareDataBytes([]byte{1, 2, 3, 4}),
 		}),
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[2], types.OperatorID(2), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[2], types.OperatorID(2), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      8,
 			Identifier: []byte{1, 2, 3, 4},
 			Data:       testingutils.PrepareDataBytes([]byte{1, 2, 3, 4}),
 		}),
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[3], types.OperatorID(3), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[3], types.OperatorID(3), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      8,
@@ -37,21 +38,21 @@ func CurrentRoundPrevPrepared() *tests.MsgProcessingSpecTest {
 	}
 
 	rcMsgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.RoundChangeMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      10,
 			Identifier: []byte{1, 2, 3, 4},
 			Data:       testingutils.RoundChangeDataBytes(nil, qbft.NoRound),
 		}),
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[2], types.OperatorID(2), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[2], types.OperatorID(2), &qbft.Message{
 			MsgType:    qbft.RoundChangeMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      10,
 			Identifier: []byte{1, 2, 3, 4},
 			Data:       testingutils.RoundChangeDataBytes(nil, qbft.NoRound),
 		}),
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[3], types.OperatorID(3), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[3], types.OperatorID(3), &qbft.Message{
 			MsgType:    qbft.RoundChangeMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      10,
@@ -61,21 +62,25 @@ func CurrentRoundPrevPrepared() *tests.MsgProcessingSpecTest {
 	}
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      10,
-			Identifier: []byte{1, 2, 3, 4},
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, prepareMsgs),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 10)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, 10),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      10,
+				Identifier: []byte{1, 2, 3, 4},
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, prepareMsgs),
+			},
+		),
 	}
 	return &tests.MsgProcessingSpecTest{
 		Name:          "proposal happy flow round > 1 (prev prepared)",
 		Pre:           pre,
-		PostRoot:      "9c725be6a189887dbe4f4917878ff579ea1d6842b02266015c7ef5b4e0703005",
+		PostRoot:      "24a4c2c76af731e0ee309907f47ca13b36c23e09e0f1ea415600155470f5b889",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 				MsgType:    qbft.PrepareMsgType,
 				Height:     qbft.FirstHeight,
 				Round:      10,
