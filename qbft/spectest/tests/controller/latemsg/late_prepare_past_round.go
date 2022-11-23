@@ -1,11 +1,12 @@
 package latemsg
 
 import (
+	"github.com/herumi/bls-eth-go-binary/bls"
+
 	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/qbft/spectest/tests"
 	"github.com/bloxapp/ssv-spec/types"
 	"github.com/bloxapp/ssv-spec/types/testingutils"
-	"github.com/herumi/bls-eth-go-binary/bls"
 )
 
 // LatePreparePastRound tests process late prepare msg for an instance which just decided for a round < decided round
@@ -38,13 +39,17 @@ func LatePreparePastRound() *tests.ControllerSpecTest {
 	}
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      qbft.FirstRound,
-			Identifier: identifier[:],
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      qbft.FirstRound,
+				Identifier: identifier[:],
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
+			},
+		),
 
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
@@ -63,13 +68,17 @@ func LatePreparePastRound() *tests.ControllerSpecTest {
 	}
 	msgs = append(msgs, rcMsgs...)
 	msgs = append(msgs, []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      2,
-			Identifier: identifier[:],
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      2,
+				Identifier: identifier[:],
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+			},
+		),
 
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
@@ -152,7 +161,7 @@ func LatePreparePastRound() *tests.ControllerSpecTest {
 						Identifier: identifier[:],
 						Data:       testingutils.CommitDataBytes([]byte{1, 2, 3, 4}),
 					}),
-				ControllerPostRoot: "cf71efe12b0ef2b9c8615ade56d5f969e7fa8a6a1fa0d95c179292825a46fe98",
+				ControllerPostRoot: "e070567461c405a81eda7fb9d1526f24a47c92fb74f9280dffbd6edb8aae500a",
 			},
 		},
 		ExpectedError: "could not process msg: invalid prepare msg: msg round wrong",
