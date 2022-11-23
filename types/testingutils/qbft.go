@@ -46,6 +46,10 @@ var TestingShare = func(keysSet *TestKeySet) *types.Share {
 	}
 }
 
+func TestingProposer(keySet *TestKeySet, height qbft.Height, round qbft.Round) types.OperatorID {
+	return TestingConfig(keySet).ProposerF(&qbft.State{Share: TestingShare(keySet), Height: height}, round)
+}
+
 var BaseInstance = func() *qbft.Instance {
 	return baseInstance(TestingShare(Testing4SharesSet()), Testing4SharesSet(), []byte{1, 2, 3, 4})
 }
