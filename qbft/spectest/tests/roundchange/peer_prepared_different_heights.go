@@ -10,7 +10,7 @@ import (
 // PeerPreparedDifferentHeights tests a round change quorum where peers prepared on different heights
 func PeerPreparedDifferentHeights() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, 3))
 	pre.State.Round = 3
 
 	prepareMsgs1 := []*qbft.SignedMessage{
@@ -86,16 +86,20 @@ func PeerPreparedDifferentHeights() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "round change peer prepared different heights",
 		Pre:           pre,
-		PostRoot:      "1708814818466ce0225a3b5c6ac00089275f9e39aa99e5440e2cc6d952d4c630",
+		PostRoot:      "ba75fc8c338ba4c11798ce23736149cf5de0581e16fa442327bc2abeef4c4fa1",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.ProposalMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      3,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, msgs, prepareMsgs2),
-			}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 3)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 3),
+				&qbft.Message{
+					MsgType:    qbft.ProposalMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      3,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, msgs, prepareMsgs2),
+				},
+			),
 		},
 	}
 }
