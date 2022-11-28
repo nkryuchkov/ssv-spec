@@ -10,7 +10,7 @@ import (
 // AfterProposal tests a round change msg after prev quorum + received proposal
 func AfterProposal() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, 2))
 	pre.State.Round = 2
 
 	rcMsgs := []*qbft.SignedMessage{
@@ -38,13 +38,17 @@ func AfterProposal() *tests.MsgProcessingSpecTest {
 	}
 
 	msgs := append(rcMsgs, []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      2,
-			Identifier: []byte{1, 2, 3, 4},
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      2,
+				Identifier: []byte{1, 2, 3, 4},
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+			},
+		),
 
 		testingutils.SignQBFTMsg(ks.Shares[4], types.OperatorID(4), &qbft.Message{
 			MsgType:    qbft.RoundChangeMsgType,
@@ -58,16 +62,20 @@ func AfterProposal() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "round change after proposal accepted",
 		Pre:           pre,
-		PostRoot:      "50bd251a1ae21323ee7ac26ffd4e4a5d682e3cca9876df86065f4c3020c14438",
+		PostRoot:      "a081e7a4ad76f23ef86dfb2fa16f9885879d798c5f3485deaf3e36ca4edc5726",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.ProposalMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-			}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.ProposalMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+				},
+			),
 			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 				MsgType:    qbft.PrepareMsgType,
 				Height:     qbft.FirstHeight,
