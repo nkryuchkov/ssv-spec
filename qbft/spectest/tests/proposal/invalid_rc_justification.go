@@ -10,7 +10,7 @@ import (
 // InvalidRoundChangeJustification tests a proposal for > 1 round, not prepared previously but one of the round change justifications has validRoundChange != nil
 func InvalidRoundChangeJustification() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
 
 	rcMsgs := []*qbft.SignedMessage{
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(2), &qbft.Message{

@@ -9,9 +9,10 @@ import (
 
 // PrepareDataInvalid tests prepare data len == 0
 func PrepareDataInvalid() *tests.MsgSpecTest {
+	ks := testingutils.Testing4SharesSet()
 	d := &qbft.PrepareData{}
 	byts, _ := d.Encode()
-	msg := testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+	msg := testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 		MsgType:    qbft.PrepareMsgType,
 		Height:     qbft.FirstHeight,
 		Round:      10,

@@ -29,9 +29,10 @@ func FourOperators() *tests.RoundRobinSpecTest {
 
 	//fmt.Printf("h:%v\nr:%v\np:%v\n", heights, rounds, proposers)
 
+	ks := testingutils.Testing4SharesSet()
 	return &tests.RoundRobinSpecTest{
 		Name:      "4 member committee",
-		Share:     testingutils.TestingShare(testingutils.Testing4SharesSet()),
+		Share:     testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		Heights:   heights,
 		Rounds:    rounds,
 		Proposers: proposers,

@@ -34,11 +34,11 @@ var TestingConfig = func(keySet *TestKeySet) *qbft.Config {
 
 var TestingInvalidValueCheck = []byte{1, 1, 1, 1}
 
-var TestingShare = func(keysSet *TestKeySet) *types.Share {
+var TestingShare = func(keysSet *TestKeySet, operatorID types.OperatorID) *types.Share {
 	return &types.Share{
-		OperatorID:      1,
+		OperatorID:      operatorID,
 		ValidatorPubKey: keysSet.ValidatorPK.Serialize(),
-		SharePubKey:     keysSet.Shares[1].GetPublicKey().Serialize(),
+		SharePubKey:     keysSet.Shares[operatorID].GetPublicKey().Serialize(),
 		DomainType:      types.PrimusTestnet,
 		Quorum:          keysSet.Threshold,
 		PartialQuorum:   keysSet.PartialThreshold,
@@ -47,23 +47,23 @@ var TestingShare = func(keysSet *TestKeySet) *types.Share {
 }
 
 func TestingProposer(keySet *TestKeySet, height qbft.Height, round qbft.Round) types.OperatorID {
-	return TestingConfig(keySet).ProposerF(&qbft.State{Share: TestingShare(keySet), Height: height}, round)
+	return TestingConfig(keySet).ProposerF(&qbft.State{Share: &types.Share{Committee: keySet.Committee()}, Height: height}, round)
 }
 
-var BaseInstance = func() *qbft.Instance {
-	return baseInstance(TestingShare(Testing4SharesSet()), Testing4SharesSet(), []byte{1, 2, 3, 4})
+var BaseInstance = func(proposerID types.OperatorID) *qbft.Instance {
+	return baseInstance(TestingShare(Testing4SharesSet(), proposerID), Testing4SharesSet(), []byte{1, 2, 3, 4})
 }
 
-var SevenOperatorsInstance = func() *qbft.Instance {
-	return baseInstance(TestingShare(Testing7SharesSet()), Testing7SharesSet(), []byte{1, 2, 3, 4})
+var SevenOperatorsInstance = func(proposerID types.OperatorID) *qbft.Instance {
+	return baseInstance(TestingShare(Testing7SharesSet(), proposerID), Testing7SharesSet(), []byte{1, 2, 3, 4})
 }
 
-var TenOperatorsInstance = func() *qbft.Instance {
-	return baseInstance(TestingShare(Testing10SharesSet()), Testing10SharesSet(), []byte{1, 2, 3, 4})
+var TenOperatorsInstance = func(proposerID types.OperatorID) *qbft.Instance {
+	return baseInstance(TestingShare(Testing10SharesSet(), proposerID), Testing10SharesSet(), []byte{1, 2, 3, 4})
 }
 
-var ThirteenOperatorsInstance = func() *qbft.Instance {
-	return baseInstance(TestingShare(Testing13SharesSet()), Testing13SharesSet(), []byte{1, 2, 3, 4})
+var ThirteenOperatorsInstance = func(proposerID types.OperatorID) *qbft.Instance {
+	return baseInstance(TestingShare(Testing13SharesSet(), proposerID), Testing13SharesSet(), []byte{1, 2, 3, 4})
 }
 
 var baseInstance = func(share *types.Share, keySet *TestKeySet, identifier []byte) *qbft.Instance {

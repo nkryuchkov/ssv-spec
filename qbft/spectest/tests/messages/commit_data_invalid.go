@@ -9,9 +9,10 @@ import (
 
 // CommitDataInvalid tests commit data len == 0
 func CommitDataInvalid() *tests.MsgSpecTest {
+	ks := testingutils.Testing4SharesSet()
 	d := &qbft.CommitData{}
 	byts, _ := d.Encode()
-	msg := testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+	msg := testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 		MsgType:    qbft.CommitMsgType,
 		Height:     qbft.FirstHeight,
 		Round:      10,

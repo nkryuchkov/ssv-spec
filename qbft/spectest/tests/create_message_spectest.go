@@ -2,11 +2,13 @@ package tests
 
 import (
 	"encoding/hex"
-	"github.com/bloxapp/ssv-spec/qbft"
-	"github.com/bloxapp/ssv-spec/types/testingutils"
+	"testing"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
-	"testing"
+
+	"github.com/bloxapp/ssv-spec/qbft"
+	"github.com/bloxapp/ssv-spec/types/testingutils"
 )
 
 const (
@@ -59,7 +61,7 @@ func (test *CreateMsgSpecTest) Run(t *testing.T) {
 func (test *CreateMsgSpecTest) createCommit() (*qbft.SignedMessage, error) {
 	ks := testingutils.Testing4SharesSet()
 	state := &qbft.State{
-		Share: testingutils.TestingShare(ks),
+		Share: testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		ID:    []byte{1, 2, 3, 4},
 	}
 	config := testingutils.TestingConfig(ks)
@@ -70,7 +72,7 @@ func (test *CreateMsgSpecTest) createCommit() (*qbft.SignedMessage, error) {
 func (test *CreateMsgSpecTest) createPrepare() (*qbft.SignedMessage, error) {
 	ks := testingutils.Testing4SharesSet()
 	state := &qbft.State{
-		Share: testingutils.TestingShare(ks),
+		Share: testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		ID:    []byte{1, 2, 3, 4},
 	}
 	config := testingutils.TestingConfig(ks)
@@ -81,7 +83,7 @@ func (test *CreateMsgSpecTest) createPrepare() (*qbft.SignedMessage, error) {
 func (test *CreateMsgSpecTest) createProposal() (*qbft.SignedMessage, error) {
 	ks := testingutils.Testing4SharesSet()
 	state := &qbft.State{
-		Share: testingutils.TestingShare(ks),
+		Share: testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		ID:    []byte{1, 2, 3, 4},
 	}
 	config := testingutils.TestingConfig(ks)
@@ -92,7 +94,7 @@ func (test *CreateMsgSpecTest) createProposal() (*qbft.SignedMessage, error) {
 func (test *CreateMsgSpecTest) createRoundChange() (*qbft.SignedMessage, error) {
 	ks := testingutils.Testing4SharesSet()
 	state := &qbft.State{
-		Share: testingutils.TestingShare(ks),
+		Share: testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		ID:    []byte{1, 2, 3, 4},
 	}
 	config := testingutils.TestingConfig(ks)

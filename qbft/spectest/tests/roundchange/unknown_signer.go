@@ -9,11 +9,12 @@ import (
 
 // UnknownSigner tests a signed round change msg with an unknown signer
 func UnknownSigner() *tests.MsgProcessingSpecTest {
-	pre := testingutils.BaseInstance()
+	ks := testingutils.Testing4SharesSet()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
 	pre.State.Round = 2
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(5), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(5), &qbft.Message{
 			MsgType:    qbft.RoundChangeMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      2,

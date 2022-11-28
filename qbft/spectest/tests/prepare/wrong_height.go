@@ -9,8 +9,9 @@ import (
 
 // WrongHeight tests prepare msg received with the wrong height
 func WrongHeight() *tests.MsgProcessingSpecTest {
-	pre := testingutils.BaseInstance()
-	pre.State.ProposalAcceptedForCurrentRound = testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+	ks := testingutils.Testing4SharesSet()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre.State.ProposalAcceptedForCurrentRound = testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 		MsgType:    qbft.ProposalMsgType,
 		Height:     qbft.FirstHeight,
 		Round:      qbft.FirstRound,
@@ -19,7 +20,7 @@ func WrongHeight() *tests.MsgProcessingSpecTest {
 	})
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
 			Height:     2,
 			Round:      qbft.FirstRound,

@@ -10,7 +10,7 @@ import (
 // FutureRound tests a proposal for state.ProposalAcceptedForCurrentRound != nil && signedProposal.Message.Round > state.Round
 func FutureRound() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
 	pre.State.ProposalAcceptedForCurrentRound = testingutils.SignQBFTMsg(
 		ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)],
 		testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound),

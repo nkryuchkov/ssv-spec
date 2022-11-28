@@ -10,7 +10,7 @@ import (
 // NoRCJustification tests a proposal for > 1 round, not prepared previously but without quorum of round change msgs justification
 func NoRCJustification() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
 
 	rcMsgs := []*qbft.SignedMessage{
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{

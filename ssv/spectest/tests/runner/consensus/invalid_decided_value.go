@@ -131,7 +131,7 @@ func InvalidDecidedValue() *tests.MultiMsgProcessingSpecTest {
 				},
 				PostDutyRunnerStateRoot: "1bd4b88c1748ff0a54d2e86b0376fea7483e15b586211be13ca5f10ee5343ea9",
 				OutputMessages: []*ssv.SignedPartialSignatureMessage{
-					testingutils.PreConsensusRandaoMsg(testingutils.Testing4SharesSet().Shares[1], 1),
+					testingutils.PreConsensusRandaoMsg(ks.Shares[1], 1),
 				},
 				ExpectedError: expectedError,
 			},

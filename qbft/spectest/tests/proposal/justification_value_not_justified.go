@@ -9,9 +9,9 @@ import (
 
 // JustificationsValueNotJustified tests a proposal for > 1 round, prepared previously with rc justification prepares at different heights but the prepare value is not the highest
 func JustificationsValueNotJustified() *tests.MsgProcessingSpecTest {
-	pre := testingutils.BaseInstance()
-	pre.State.Round = 3
 	ks := testingutils.Testing4SharesSet()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre.State.Round = 3
 
 	prepareMsgs1 := []*qbft.SignedMessage{
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{

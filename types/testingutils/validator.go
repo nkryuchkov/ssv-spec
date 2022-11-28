@@ -1,6 +1,7 @@
 package testingutils
 
 import (
+	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/ssv"
 	"github.com/bloxapp/ssv-spec/types"
 )
@@ -10,7 +11,7 @@ var BaseValidator = func(keySet *TestKeySet) *ssv.Validator {
 		NewTestingNetwork(),
 		NewTestingBeaconNode(),
 		NewTestingStorage(),
-		TestingShare(keySet),
+		TestingShare(keySet, TestingProposer(keySet, qbft.FirstHeight, qbft.FirstRound)),
 		NewTestingKeyManager(),
 		map[types.BeaconRole]ssv.Runner{
 			types.BNRoleAttester:                  AttesterRunner(keySet),

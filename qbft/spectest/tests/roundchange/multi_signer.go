@@ -10,7 +10,8 @@ import (
 
 // MultiSigner tests a round change msg with multiple signers
 func MultiSigner() *tests.MsgProcessingSpecTest {
-	pre := testingutils.BaseInstance()
+	ks := testingutils.Testing4SharesSet()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
 	pre.State.Round = 2
 
 	msgs := []*qbft.SignedMessage{

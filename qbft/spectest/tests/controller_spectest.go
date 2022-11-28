@@ -3,12 +3,14 @@ package tests
 import (
 	"bytes"
 	"encoding/hex"
+	"reflect"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/types"
 	"github.com/bloxapp/ssv-spec/types/testingutils"
-	"github.com/stretchr/testify/require"
-	"reflect"
-	"testing"
 )
 
 type RunInstanceData struct {
@@ -30,11 +32,12 @@ type ControllerSpecTest struct {
 }
 
 func (test *ControllerSpecTest) Run(t *testing.T) {
+	ks := testingutils.Testing4SharesSet()
 	identifier := types.NewMsgID(testingutils.TestingValidatorPubKey[:], types.BNRoleAttester)
-	config := testingutils.TestingConfig(testingutils.Testing4SharesSet())
+	config := testingutils.TestingConfig(ks)
 	contr := testingutils.NewTestingQBFTController(
 		identifier[:],
-		testingutils.TestingShare(testingutils.Testing4SharesSet()),
+		testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		config,
 	)
 

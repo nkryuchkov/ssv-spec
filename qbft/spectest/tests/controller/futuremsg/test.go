@@ -2,11 +2,13 @@ package futuremsg
 
 import (
 	"encoding/hex"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/types"
 	"github.com/bloxapp/ssv-spec/types/testingutils"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type ControllerSyncSpecTest struct {
@@ -22,11 +24,12 @@ func (test *ControllerSyncSpecTest) TestName() string {
 }
 
 func (test *ControllerSyncSpecTest) Run(t *testing.T) {
+	ks := testingutils.Testing4SharesSet()
 	identifier := types.NewMsgID(testingutils.TestingValidatorPubKey[:], types.BNRoleAttester)
-	config := testingutils.TestingConfig(testingutils.Testing4SharesSet())
+	config := testingutils.TestingConfig(ks)
 	contr := testingutils.NewTestingQBFTController(
 		identifier[:],
-		testingutils.TestingShare(testingutils.Testing4SharesSet()),
+		testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)),
 		config,
 	)
 

@@ -9,9 +9,9 @@ import (
 
 // CurrentRoundPrevPrepared tests a > first round proposal prev prepared
 func CurrentRoundPrevPrepared() *tests.MsgProcessingSpecTest {
-	pre := testingutils.BaseInstance()
-	pre.State.Round = 10
 	ks := testingutils.Testing4SharesSet()
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre.State.Round = 10
 
 	prepareMsgs := []*qbft.SignedMessage{
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{

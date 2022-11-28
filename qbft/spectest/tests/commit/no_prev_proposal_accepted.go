@@ -9,10 +9,11 @@ import (
 
 // NoPrevAcceptedProposal tests a commit msg received without a previous accepted proposal
 func NoPrevAcceptedProposal() *tests.MsgProcessingSpecTest {
-	pre := testingutils.BaseInstance()
+	ks := testingutils.Testing4SharesSet
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks(), qbft.FirstHeight, qbft.FirstRound))
 	pre.State.ProposalAcceptedForCurrentRound = nil
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], types.OperatorID(1), &qbft.Message{
+		testingutils.SignQBFTMsg(ks().Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.CommitMsgType,
 			Height:     qbft.FirstHeight,
 			Round:      qbft.FirstRound,

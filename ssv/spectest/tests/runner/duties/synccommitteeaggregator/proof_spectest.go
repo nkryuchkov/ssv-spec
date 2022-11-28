@@ -2,10 +2,13 @@ package synccommitteeaggregator
 
 import (
 	"encoding/hex"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/types"
 	"github.com/bloxapp/ssv-spec/types/testingutils"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type SyncCommitteeAggregatorProofSpecTest struct {
@@ -22,7 +25,7 @@ func (test *SyncCommitteeAggregatorProofSpecTest) TestName() string {
 
 func (test *SyncCommitteeAggregatorProofSpecTest) Run(t *testing.T) {
 	ks := testingutils.Testing4SharesSet()
-	share := testingutils.TestingShare(ks)
+	share := testingutils.TestingShare(ks, testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
 	v := testingutils.BaseValidator(keySetForShare(share))
 	r := v.DutyRunners[types.BNRoleSyncCommitteeContribution]
 	r.GetBeaconNode().(*testingutils.TestingBeaconNode).SetSyncCommitteeAggregatorRootHexes(test.ProofRootsMap)

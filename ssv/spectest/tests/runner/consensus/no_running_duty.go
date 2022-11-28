@@ -20,7 +20,7 @@ func NoRunningDuty() *tests.MultiMsgProcessingSpecTest {
 				Duty:   testingutils.TestingSyncCommitteeContributionDuty,
 				Messages: []*types.SSVMessage{
 					testingutils.SSVMsgSyncCommitteeContribution(
-						testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[4], types.OperatorID(4), &qbft.Message{
+						testingutils.SignQBFTMsg(ks.Shares[4], types.OperatorID(4), &qbft.Message{
 							MsgType:    qbft.ProposalMsgType,
 							Height:     qbft.FirstHeight,
 							Round:      qbft.FirstRound,
@@ -38,7 +38,7 @@ func NoRunningDuty() *tests.MultiMsgProcessingSpecTest {
 				Duty:   testingutils.TestingSyncCommitteeDuty,
 				Messages: []*types.SSVMessage{
 					testingutils.SSVMsgSyncCommittee(
-						testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[4], types.OperatorID(4), &qbft.Message{
+						testingutils.SignQBFTMsg(ks.Shares[4], types.OperatorID(4), &qbft.Message{
 							MsgType:    qbft.ProposalMsgType,
 							Height:     qbft.FirstHeight,
 							Round:      qbft.FirstRound,
@@ -56,7 +56,7 @@ func NoRunningDuty() *tests.MultiMsgProcessingSpecTest {
 				Duty:   testingutils.TestingAggregatorDuty,
 				Messages: []*types.SSVMessage{
 					testingutils.SSVMsgAggregator(
-						testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[4], types.OperatorID(4), &qbft.Message{
+						testingutils.SignQBFTMsg(ks.Shares[4], types.OperatorID(4), &qbft.Message{
 							MsgType:    qbft.ProposalMsgType,
 							Height:     qbft.FirstHeight,
 							Round:      qbft.FirstRound,
@@ -74,7 +74,7 @@ func NoRunningDuty() *tests.MultiMsgProcessingSpecTest {
 				Duty:   testingutils.TestingProposerDuty,
 				Messages: []*types.SSVMessage{
 					testingutils.SSVMsgProposer(
-						testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[4], types.OperatorID(4), &qbft.Message{
+						testingutils.SignQBFTMsg(ks.Shares[4], types.OperatorID(4), &qbft.Message{
 							MsgType:    qbft.ProposalMsgType,
 							Height:     qbft.FirstHeight,
 							Round:      qbft.FirstRound,
@@ -92,7 +92,7 @@ func NoRunningDuty() *tests.MultiMsgProcessingSpecTest {
 				Duty:   testingutils.TestingAttesterDuty,
 				Messages: []*types.SSVMessage{
 					testingutils.SSVMsgAttester(
-						testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[4], types.OperatorID(4), &qbft.Message{
+						testingutils.SignQBFTMsg(ks.Shares[4], types.OperatorID(4), &qbft.Message{
 							MsgType:    qbft.ProposalMsgType,
 							Height:     qbft.FirstHeight,
 							Round:      qbft.FirstRound,

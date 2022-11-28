@@ -9,6 +9,7 @@ import (
 
 // SingleConsensusMsg tests process msg of a single msg
 func SingleConsensusMsg() *tests.ControllerSpecTest {
+	ks := testingutils.Testing4SharesSet()
 	identifier := types.NewMsgID(testingutils.TestingValidatorPubKey[:], types.BNRoleAttester)
 	return &tests.ControllerSpecTest{
 		Name: "single consensus msg",
@@ -16,7 +17,7 @@ func SingleConsensusMsg() *tests.ControllerSpecTest {
 			{
 				InputValue: []byte{1, 2, 3, 4},
 				InputMessages: []*qbft.SignedMessage{
-					testingutils.SignQBFTMsg(testingutils.Testing4SharesSet().Shares[1], 1, &qbft.Message{
+					testingutils.SignQBFTMsg(ks.Shares[1], 1, &qbft.Message{
 						MsgType:    qbft.ProposalMsgType,
 						Height:     qbft.FirstHeight,
 						Round:      qbft.FirstRound,
