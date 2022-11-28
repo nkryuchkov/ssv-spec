@@ -10,7 +10,7 @@ import (
 // ValidJustification tests a valid rc quorum justification
 func ValidJustification() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, 2))
 	pre.State.ProposalAcceptedForCurrentRound = nil // proposal resets on upon timeout
 	pre.State.Round = 2
 
@@ -64,16 +64,20 @@ func ValidJustification() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "valid justification",
 		Pre:           pre,
-		PostRoot:      "d0ed6602d72af81d47d1e1ac5f98131fd4e349c15a8d2a328ed0f96ff275f224",
+		PostRoot:      "05fab5a8235d0056b29af5d1f7c12fdc4f1c16d617392896a1009e92c06bd213",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.ProposalMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, msgs, prepareMsgs),
-			}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.ProposalMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, msgs, prepareMsgs),
+				},
+			),
 		},
 	}
 }
