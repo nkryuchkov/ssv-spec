@@ -10,7 +10,7 @@ import (
 // DuplicateMsgQuorum tests a duplicate rc msg for signer 1, after which enough msgs for quorum
 func DuplicateMsgQuorum() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, 2))
 	pre.State.Round = 2
 
 	prepareMsgs := []*qbft.SignedMessage{
@@ -94,16 +94,20 @@ func DuplicateMsgQuorum() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "round change duplicate msg quorum",
 		Pre:           pre,
-		PostRoot:      "1c4727292dfab7272506b272505b982ebf0cf6cdca26e70a381ffc3619ebf5f2",
+		PostRoot:      "692615005a5c2ee1a292cea199abb03a9b03c42c9b9dec67ace830718fba6181",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.ProposalMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-			}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.ProposalMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+				},
+			),
 		},
 	}
 }
