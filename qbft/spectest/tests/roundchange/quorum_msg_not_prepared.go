@@ -10,7 +10,7 @@ import (
 // QuorumMsgNotPrepared tests LIVENESS where the rc msg making a quorum for round change is not prev prepared (other are) which can cause a liveness issue with isReceivedProposalJustification
 func QuorumMsgNotPrepared() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, 2))
 	pre.State.Round = 2
 
 	prepareMsgs := []*qbft.SignedMessage{
@@ -63,16 +63,20 @@ func QuorumMsgNotPrepared() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "round change quorum msg not prepared",
 		Pre:           pre,
-		PostRoot:      "578e59d3fba60d1cca6e2f022c2845148c2c98dee22aa2a30aa3d6ecce47d768",
+		PostRoot:      "1d59e4b5aa1e933bf24f236b4589b7cdabca6025c2a028d4888ba6e130b2873e",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.ProposalMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, msgs, prepareMsgs),
-			}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.ProposalMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, msgs, prepareMsgs),
+				},
+			),
 		},
 	}
 }
