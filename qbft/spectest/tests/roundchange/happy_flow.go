@@ -10,7 +10,7 @@ import (
 // HappyFlow tests a simple full happy flow until decided
 func HappyFlow() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, 2))
 
 	rcMsgs := []*qbft.SignedMessage{
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
@@ -37,23 +37,31 @@ func HappyFlow() *tests.MsgProcessingSpecTest {
 	}
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      qbft.FirstRound,
-			Identifier: []byte{1, 2, 3, 4},
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      qbft.FirstRound,
+				Identifier: []byte{1, 2, 3, 4},
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, nil, nil),
+			},
+		),
 	}
 	msgs = append(msgs, rcMsgs...)
 	msgs = append(msgs,
-		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      2,
-			Identifier: []byte{1, 2, 3, 4},
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      2,
+				Identifier: []byte{1, 2, 3, 4},
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+			},
+		),
 
 		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
 			MsgType:    qbft.PrepareMsgType,
@@ -102,44 +110,59 @@ func HappyFlow() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "round change happy flow",
 		Pre:           pre,
-		PostRoot:      "8a3b3bf7dfb34d4c1117c611229b0856eb26e23b6c73c0ab1592231ebef74781",
+		PostRoot:      "0351eaee1f7e68aac89da769eb0e37b27902d25cb71f74554b8745d0f916611e",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.PrepareMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      qbft.FirstRound,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.PrepareDataBytes([]byte{1, 2, 3, 4}),
-			}),
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.RoundChangeMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.RoundChangeDataBytes(nil, qbft.NoRound),
-			}),
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.ProposalMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-			}),
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.PrepareMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.PrepareDataBytes([]byte{1, 2, 3, 4}),
-			}),
-			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-				MsgType:    qbft.CommitMsgType,
-				Height:     qbft.FirstHeight,
-				Round:      2,
-				Identifier: []byte{1, 2, 3, 4},
-				Data:       testingutils.CommitDataBytes([]byte{1, 2, 3, 4}),
-			}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound),
+				&qbft.Message{
+					MsgType:    qbft.PrepareMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      qbft.FirstRound,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.PrepareDataBytes([]byte{1, 2, 3, 4}),
+				}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2), &qbft.Message{
+					MsgType:    qbft.RoundChangeMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.RoundChangeDataBytes(nil, qbft.NoRound),
+				}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.ProposalMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+				},
+			),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.PrepareMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.PrepareDataBytes([]byte{1, 2, 3, 4}),
+				}),
+			testingutils.SignQBFTMsg(
+				ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 2)],
+				testingutils.TestingProposer(ks, qbft.FirstHeight, 2),
+				&qbft.Message{
+					MsgType:    qbft.CommitMsgType,
+					Height:     qbft.FirstHeight,
+					Round:      2,
+					Identifier: []byte{1, 2, 3, 4},
+					Data:       testingutils.CommitDataBytes([]byte{1, 2, 3, 4}),
+				}),
 		},
 		ExpectedTimerState: &testingutils.TimerState{
 			Timeouts: 1,
