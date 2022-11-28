@@ -38,18 +38,22 @@ func FutureRoundPrevNotPrepared() *tests.MsgProcessingSpecTest {
 	}
 
 	msgs := []*qbft.SignedMessage{
-		testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
-			MsgType:    qbft.ProposalMsgType,
-			Height:     qbft.FirstHeight,
-			Round:      10,
-			Identifier: []byte{1, 2, 3, 4},
-			Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
-		}),
+		testingutils.SignQBFTMsg(
+			ks.Shares[testingutils.TestingProposer(ks, qbft.FirstHeight, 10)],
+			testingutils.TestingProposer(ks, qbft.FirstHeight, 10),
+			&qbft.Message{
+				MsgType:    qbft.ProposalMsgType,
+				Height:     qbft.FirstHeight,
+				Round:      10,
+				Identifier: []byte{1, 2, 3, 4},
+				Data:       testingutils.ProposalDataBytes([]byte{1, 2, 3, 4}, rcMsgs, nil),
+			},
+		),
 	}
 	return &tests.MsgProcessingSpecTest{
 		Name:          "proposal future round prev not prepared",
 		Pre:           pre,
-		PostRoot:      "b261accce13a88f020c601d0314bd6eaecd6cb0cea3232198b258cdcc55c1263",
+		PostRoot:      "7ffbb1c1d66e2f54a5ca60719b9c2531c96b2df97164af1c7522b14cfeb1ff5f",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
 			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
