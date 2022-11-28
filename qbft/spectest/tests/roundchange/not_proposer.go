@@ -10,7 +10,7 @@ import (
 // NotProposer tests a justified round change but node is not the proposer
 func NotProposer() *tests.MsgProcessingSpecTest {
 	ks := testingutils.Testing4SharesSet()
-	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, qbft.FirstHeight, qbft.FirstRound))
+	pre := testingutils.BaseInstance(testingutils.TestingProposer(ks, tests.ChangeProposerFuncInstanceHeight, qbft.FirstRound))
 	pre.State.Height = tests.ChangeProposerFuncInstanceHeight // will change proposer default for tests
 
 	msgs := []*qbft.SignedMessage{
@@ -39,7 +39,7 @@ func NotProposer() *tests.MsgProcessingSpecTest {
 	return &tests.MsgProcessingSpecTest{
 		Name:          "round change justification not proposer",
 		Pre:           pre,
-		PostRoot:      "5f11ad62af6755dc66b2850d99dd92ac8f3549dbd9154f795d0efa772943d0a7",
+		PostRoot:      "fd350621cc2e586dd6d1a4c95d701aaa207585d762e77a36e2db1a0f5dc9bb82",
 		InputMessages: msgs,
 		OutputMessages: []*qbft.SignedMessage{
 			testingutils.SignQBFTMsg(ks.Shares[1], types.OperatorID(1), &qbft.Message{
