@@ -1,17 +1,20 @@
 package testingutils
 
 import (
+	"sync/atomic"
+
 	"github.com/bloxapp/ssv-spec/dkg"
 	"github.com/bloxapp/ssv-spec/qbft"
 	"github.com/bloxapp/ssv-spec/types"
 )
 
 type TestingNetwork struct {
+	// needs to be 8 byte aligned due to atomic usage
+	SyncHighestDecidedCnt     uint64
+	SyncHighestChangeRoundCnt uint64
 	BroadcastedMsgs           []*types.SSVMessage
 	DKGOutputs                map[types.OperatorID]*dkg.SignedOutput
 	BlameOutput               *dkg.BlameOutput
-	SyncHighestDecidedCnt     int
-	SyncHighestChangeRoundCnt int
 }
 
 func NewTestingNetwork() *TestingNetwork {
@@ -42,12 +45,12 @@ func (net *TestingNetwork) StreamDKGBlame(blame *dkg.BlameOutput) error {
 }
 
 func (net *TestingNetwork) SyncHighestDecided(identifier types.MessageID) error {
-	net.SyncHighestDecidedCnt++
+	atomic.AddUint64(&net.SyncHighestDecidedCnt, 1)
 	return nil
 }
 
 func (net *TestingNetwork) SyncHighestRoundChange(identifier types.MessageID, height qbft.Height) error {
-	net.SyncHighestChangeRoundCnt++
+	atomic.AddUint64(&net.SyncHighestChangeRoundCnt, 1)
 	return nil
 }
 
