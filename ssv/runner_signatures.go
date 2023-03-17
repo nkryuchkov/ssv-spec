@@ -4,7 +4,6 @@ import (
 	spec "github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/bloxapp/ssv-spec/types"
 	ssz "github.com/ferranbt/fastssz"
-	"github.com/herumi/bls-eth-go-binary/bls"
 	"github.com/pkg/errors"
 )
 
@@ -77,17 +76,17 @@ func (b *BaseRunner) verifyBeaconPartialSignature(msg *types.PartialSignatureMes
 
 	for _, n := range b.Share.Committee {
 		if n.GetID() == signer {
-			pk := &bls.PublicKey{}
-			if err := pk.Deserialize(n.GetPublicKey()); err != nil {
-				return errors.Wrap(err, "could not deserialized pk")
-			}
-			sig := &bls.Sign{}
-			if err := sig.Deserialize(signature); err != nil {
-				return errors.Wrap(err, "could not deserialized Signature")
+			pk := new(types.BLSPublicKey).Uncompress(n.GetPublicKey())
+			if pk == nil {
+				return errors.New("could not deserialized pk")
 			}
 
-			// verify
-			if !sig.VerifyByte(pk, root[:]) {
+			sig := new(types.BLSSignature).Uncompress(signature)
+			if sig == nil {
+				return errors.New("could not deserialized Signature")
+			}
+
+			if !sig.Verify(false, pk, false, root[:], types.CipherSuite) {
 				return errors.New("wrong signature")
 			}
 			return nil

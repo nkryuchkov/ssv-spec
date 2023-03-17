@@ -14,6 +14,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prysmaticlabs/go-bitfield v0.0.0-20210809151128-385d8c5e3fb7
 	github.com/stretchr/testify v1.8.0
+	github.com/supranational/blst v0.3.10
 )
 
 require (

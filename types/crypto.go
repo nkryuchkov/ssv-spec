@@ -14,20 +14,19 @@ import (
 // VerifyByOperators verifies signature by the provided operators
 func (s Signature) VerifyByOperators(data MessageSignature, domain DomainType, sigType SignatureType, operators []*Operator) error {
 	// decode sig
-	sign := &bls.Sign{}
-	if err := sign.Deserialize(s); err != nil {
-		return errors.Wrap(err, "failed to deserialize signature")
+	sign := new(BLSSignature).Uncompress(s)
+	if sign == nil {
+		return errors.New("failed to deserialize signature")
 	}
-
 	// find operators
-	pks := make([]bls.PublicKey, 0)
+	pks := make([]*BLSPublicKey, 0)
 	for _, id := range data.GetSigners() {
 		found := false
 		for _, n := range operators {
 			if id == n.GetID() {
-				pk := bls.PublicKey{}
-				if err := pk.Deserialize(n.GetPublicKey()); err != nil {
-					return errors.Wrap(err, "failed to deserialize public key")
+				pk := new(BLSPublicKey).Uncompress(n.GetPublicKey())
+				if pk == nil {
+					return errors.New("failed to deserialize public key")
 				}
 
 				pks = append(pks, pk)
@@ -46,32 +45,29 @@ func (s Signature) VerifyByOperators(data MessageSignature, domain DomainType, s
 	}
 
 	// verify
-	if res := sign.FastAggregateVerify(pks, computedRoot); !res {
+	if res := sign.FastAggregateVerify(true, pks, computedRoot, CipherSuite); !res {
 		return errors.New("failed to verify signature")
 	}
 	return nil
 }
 
 func (s Signature) VerifyMultiPubKey(data Root, domain DomainType, sigType SignatureType, pks [][]byte) error {
-	var aggPK *bls.PublicKey
+	aggPK := new(BLSAggregatePublicKey)
+
 	for _, pkByts := range pks {
-		pk := &bls.PublicKey{}
-		if err := pk.Deserialize(pkByts); err != nil {
-			return errors.Wrap(err, "failed to deserialize public key")
+		pk := new(BLSPublicKey).Uncompress(pkByts)
+		if pk == nil {
+			return errors.New("failed to deserialize public key")
 		}
 
-		if aggPK == nil {
-			aggPK = pk
-		} else {
-			aggPK.Add(pk)
-		}
+		aggPK.Add(pk, false) // group already checked
 	}
 
 	if aggPK == nil {
 		return errors.New("no public keys found")
 	}
 
-	return s.Verify(data, domain, sigType, aggPK.Serialize())
+	return s.Verify(data, domain, sigType, aggPK.ToAffine().Compress())
 }
 
 func (s Signature) Verify(data Root, domain DomainType, sigType SignatureType, pkByts []byte) error {
@@ -80,17 +76,17 @@ func (s Signature) Verify(data Root, domain DomainType, sigType SignatureType, p
 		return errors.Wrap(err, "could not compute signing root")
 	}
 
-	sign := &bls.Sign{}
-	if err := sign.Deserialize(s); err != nil {
-		return errors.Wrap(err, "failed to deserialize signature")
+	sign := new(BLSSignature).Uncompress(s)
+	if sign == nil {
+		return errors.New("failed to deserialize signature")
 	}
 
-	pk := &bls.PublicKey{}
-	if err := pk.Deserialize(pkByts); err != nil {
-		return errors.Wrap(err, "failed to deserialize public key")
+	pk := new(BLSPublicKey).Uncompress(pkByts)
+	if pk == nil {
+		return errors.New("failed to deserialize public key")
 	}
 
-	if res := sign.VerifyByte(pk, computedRoot); !res {
+	if res := sign.Verify(false, pk, false, computedRoot, CipherSuite); !res {
 		return errors.New("failed to verify signature")
 	}
 	return nil
@@ -121,18 +117,21 @@ func (s Signature) ECRecover(data Root, domain DomainType, sigType SignatureType
 }
 
 func (s Signature) Aggregate(other Signature) (Signature, error) {
-	s1 := &bls.Sign{}
-	if err := s1.Deserialize(s); err != nil {
-		return nil, errors.Wrap(err, "failed to deserialize signature")
+	s1 := new(BLSSignature).Uncompress(s)
+	if s1 == nil {
+		return nil, errors.New("failed to deserialize signature")
 	}
 
-	s2 := &bls.Sign{}
-	if err := s2.Deserialize(other); err != nil {
-		return nil, errors.Wrap(err, "failed to deserialize signature")
+	s2 := new(BLSSignature).Uncompress(other)
+	if s2 == nil {
+		return nil, errors.New("failed to deserialize signature")
 	}
 
-	s1.Add(s2)
-	return s1.Serialize(), nil
+	agg := new(BLSAggregateSignature)
+	agg.Add(s1, false) // group already checked
+	agg.Add(s2, false) // group already checked
+
+	return agg.ToAffine().Compress(), nil
 }
 
 func ComputeSigningRoot(data Root, domain SignatureDomain) ([]byte, error) {
@@ -151,7 +150,7 @@ func ComputeSignatureDomain(domain DomainType, sigType SignatureType) SignatureD
 
 // ReconstructSignatures receives a map of user indexes and serialized bls.Sign.
 // It then reconstructs the original threshold signature using lagrange interpolation
-func ReconstructSignatures(signatures map[OperatorID][]byte) (*bls.Sign, error) {
+func ReconstructSignatures(signatures map[OperatorID][]byte) (*BLSSignature, error) {
 	reconstructedSig := bls.Sign{}
 
 	idVec := make([]bls.ID, 0)
@@ -165,6 +164,7 @@ func ReconstructSignatures(signatures map[OperatorID][]byte) (*bls.Sign, error) 
 		}
 
 		idVec = append(idVec, blsID)
+
 		blsSig := bls.Sign{}
 
 		err = blsSig.Deserialize(signature)
@@ -174,18 +174,28 @@ func ReconstructSignatures(signatures map[OperatorID][]byte) (*bls.Sign, error) 
 
 		sigVec = append(sigVec, blsSig)
 	}
-	err := reconstructedSig.Recover(sigVec, idVec)
-	return &reconstructedSig, err
+
+	// Recover is not implemented in BLST, TODO: make sure it works
+	if err := reconstructedSig.Recover(sigVec, idVec); err != nil {
+		return nil, fmt.Errorf("recover signature: %w", err)
+	}
+
+	blstReconstructedSig := new(BLSSignature).Uncompress(reconstructedSig.Serialize())
+	if blstReconstructedSig == nil {
+		return nil, errors.New("failed to deserialize signature")
+	}
+
+	return blstReconstructedSig, nil
 }
 
-func VerifyReconstructedSignature(sig *bls.Sign, validatorPubKey []byte, root [32]byte) error {
-	pk := &bls.PublicKey{}
-	if err := pk.Deserialize(validatorPubKey); err != nil {
-		return errors.Wrap(err, "could not deserialize validator pk")
+func VerifyReconstructedSignature(sig *BLSSignature, validatorPubKey []byte, root [32]byte) error {
+	pk := new(BLSPublicKey).Uncompress(validatorPubKey)
+	if pk == nil {
+		return errors.New("could not deserialize validator pk")
 	}
 
 	// verify reconstructed sig
-	if res := sig.VerifyByte(pk, root[:]); !res {
+	if res := sig.Verify(false, pk, false, root[:], CipherSuite); !res {
 		return errors.New("could not reconstruct a valid signature")
 	}
 	return nil
