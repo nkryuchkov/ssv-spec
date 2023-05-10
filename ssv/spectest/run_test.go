@@ -208,7 +208,7 @@ func fixRunnerForRun(t *testing.T, runnerMap map[string]interface{}, ks *testing
 	}
 
 	if gasLimit, ok := runnerMap["GasLimit"]; ok {
-		ret.(*ssv.ValidatorRegistrationRunner).GasLimit = gasLimit.(uint64)
+		ret.(*ssv.ValidatorRegistrationRunner).GasLimit = uint64(gasLimit.(float64))
 	}
 
 	if ret.GetBaseRunner().QBFTController != nil {
